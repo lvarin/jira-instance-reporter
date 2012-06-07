@@ -21,6 +21,7 @@ import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.ComponentManager;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.issue.IssueManager;
+import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.project.version.VersionManager;
@@ -48,6 +49,7 @@ public class ReporterResource {
 	private SortedSet<Long> issueTimes;
 	private int nbIssues = 0;
 	private int nbProjects = 0;
+	private final Calendar oldDate = Calendar.getInstance();
 
 	public ReporterResource(final SearchService searchService,
 			final JiraAuthenticationContext authenticationContext,
@@ -56,6 +58,7 @@ public class ReporterResource {
 		this.authenticationContext = authenticationContext;
 		projectManager = ComponentManager.getInstance().getProjectManager();
 		issueManager = ComponentManager.getInstance().getIssueManager();
+		oldDate.set(1970, 2, 1);
 	}
 
 	@GET
@@ -73,8 +76,13 @@ public class ReporterResource {
 					Collection<Long> issuesId = issueManager
 							.getIssueIdsForProject(p.getId());
 					for (Long id : issuesId) {
-						issueTimes.add(issueManager.getIssueObject(id)
-								.getCreated().getTime());
+						MutableIssue issue = issueManager.getIssueObject(id);
+						if (issue.getCreated().after(oldDate.getTime())) {
+							issueTimes.add(issue.getCreated().getTime());
+						} else {
+							issueTimes.add(issue.getUpdated().getTime());
+						}
+
 					}
 					if (!issuesId.isEmpty())
 						projectTimes.add(estimateCreationDate(p.getId()));
@@ -98,7 +106,7 @@ public class ReporterResource {
 		}
 		return Response.ok(nbProjects).cacheControl(NO_CACHE).build();
 	}
-	
+
 	@GET
 	@Path("/getNumberOfIssues")
 	public Response getNumberOfIssues() {
@@ -107,7 +115,7 @@ public class ReporterResource {
 		}
 		return Response.ok(nbIssues).cacheControl(NO_CACHE).build();
 	}
-	
+
 	@GET
 	@Path("/getProjectTimeList")
 	public Response getProjectTimeList() {
@@ -135,6 +143,14 @@ public class ReporterResource {
 			Timestamp t = issueManager.getIssueObject(id).getCreated();
 			if (t.before(oldest))
 				oldest = t;
+		}
+		if (oldest.before(oldDate.getTime())) {
+			oldest = new Timestamp(Long.MAX_VALUE);
+			for (Long id : issuesId) {
+				Timestamp t = issueManager.getIssueObject(id).getUpdated();
+				if (t.before(oldest))
+					oldest = t;
+			}
 		}
 		return oldest.getTime();
 	}
