@@ -1,0 +1,3 @@
+gadget.cern.egroups.title = CERN eGroups mapper
+gadget.cern.egroups.description=Enable admin to map some eGroups member to Jira Group
+gadget.cern.egroups.configTitle = CERN eGroups mapper

@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+	<ModulePrefs title="__MSG_gadget.cern.reporter.title__"
+		directory_title="__MSG_gadget.cern.reporter.title__" description="__MSG_gadget.cern.reporter.description__"
+		author="CERN ITS Team">
+		<!-- screenshot='#staticResourceUrl("ch.cern.plugins.egroups.egroups-gadget:egroups-gadget", 
+			"screenshot.png")' thumbnail='#staticResourceUrl("ch.cern.plugins.egroups.egroups-gadget:egroups-gadget", 
+			"thumbnail.png")' -->
+
+		<Require feature="dynamic-height" />
+		<Require feature="minimessage" />
+		<Require feature="setprefs" />
+		<Require feature="settitle" />
+		<Require feature="views" />
+		<Optional feature="atlassian.util" />
+		<Optional feature="gadget-directory">
+			<Param name="categories">
+				. JIRA
+			</Param>
+		</Optional>
+
+		#oauth
+		#supportedLocales("gadget.common,gadget.cern.reporter")
+		#supportLocales
+	</ModulePrefs>
+	<UserPref name="isConfigured" datatype="hidden" default_value="false" />
+	<Content type="html">
+
+ 
+     <![CDATA[
+#requireResource("com.atlassian.jira.gadgets:common")
+#requireResource("ch.cern.its.InstanceReporter:reporter-resources")
+#includeResources()
+
+<script>
+	(function() {
+		var gadget = AJS.Gadget({
+			baseUrl : "__ATLASSIAN_BASE_URL__",
+			view : {
+				onResizeAdjustHeight : true,
+				enableReload : true,
+				template : function(args) {
+					var gadget = this;
+					var baseUrl = AJS.$.ajaxSettings.baseUrl;
+				}
+			}
+		});
+		//gadget.getView().empty();
+
+	})();
+</script>
+		<div class="aui-tabs horizontal-tabs" id="tabs-reporter">
+		    <ul class="tabs-menu">
+		        <li class="menu-item active-tab">
+		            <a href="#tabs-projects"><strong>Number of projects over time</strong></a>
+		        </li>
+		        <li class="menu-item">
+		            <a href="#tabs-issues" onClick="computeTabIssues();"><strong>Number of issues over time</strong></a>
+		        </li>
+		        <li class="menu-item">
+		            <a href="#tabs-data" onClick="computeTabData();"><strong>Data summary</strong></a>
+		        </li>
+	
+		    </ul>
+		    <div class="tabs-pane active-pane" id="tabs-projects">
+		        <br/>
+
+		        <div id="projects_graph" style="height:500px;"></div>
+		    </div>
+		    <div class="tabs-pane" id="tabs-issues">
+		        <br/>
+
+		        <div id="issues_graph" style="height:500px;"></div>
+		        
+		    </div>
+		    <div class="tabs-pane" id="tabs-data">
+		        <div id ="data_instance">
+		        	<center>
+						<strong>Number of projects : </strong> <span id="nb_proj"></span> 
+						<br/>
+						<strong>Number of issues : </strong><span id="nb_issues"></span>
+					</center>
+		        </div>
+		    </div>
+		</div><!-- // .aui-tabs -->
+
+    <script type="text/javascript">
+    AJS.$
+								.ajax({
+									url : "/rest/reporter-rest/1.0/reporter-manager/preCompute",
+									type : "GET",
+									success : function(inutile) {
+							
+								computeTabProjects();
+									}
+									});
+									
+    function computeTabData() {
+    		AJS.$.ajax({
+									url : "/rest/reporter-rest/1.0/reporter-manager/getNumberOfProjects",
+									type : "GET",
+									dataType : "json",
+									success : function(nbProj) {
+										    AJS.$.ajax({
+											url : "/rest/reporter-rest/1.0/reporter-manager/getNumberOfIssues",
+											type : "GET",
+											dataType : "json",
+											success : function(nbIssues) {
+												document.getElementById("nb_proj").innerHTML = nbProj;
+												document.getElementById("nb_issues").innerHTML = nbIssues;
+											}
+											});
+									}
+								});
+    }
+									
+	function computeTabProjects() {
+	
+	AJS.$
+								.ajax({
+									url : "/rest/reporter-rest/1.0/reporter-manager/getProjectTimeList",
+									type : "GET",
+									dataType : "json",
+									success : function(pList) {
+										  var
+										    d1    = [],
+										    graph,
+										    x = 0, o;
+										  var container = document.getElementById("projects_graph");
+										for ( var i = 0; i < pList.length; ++i) {
+
+											    x = x+1;
+											    d1.push([pList[i], x]);
+											    
+										}
+										d1.push([pList[pList.length-1]+(3600*24*60*30), x]);
+										var options = {
+											    xaxis : {
+											      mode : 'time', 
+											      labelsAngle : 45
+											    },
+											    selection : {
+											      mode : 'x'
+											    },
+											    HtmlText : false,
+											    title : 'Number of projects over time'
+											  };
+										// Draw graph with default options, overwriting with passed options
+										  function drawGraph (opts) {
+
+										    // Clone the options, so the 'options' variable always keeps intact.
+										    o = Flotr._.extend(Flotr._.clone(options), opts || {});
+
+										    // Return a new graph.
+										    return Flotr.draw(
+										      container,
+										      [ d1 ],
+										      o
+										    );
+										  }
+
+										  graph = drawGraph();      
+										        
+										  Flotr.EventAdapter.observe(container, 'flotr:select', function(area){
+										    // Draw selected area
+										    graph = drawGraph({
+										      xaxis : { min : area.x1, max : area.x2, mode : 'time', labelsAngle : 45 },
+										      yaxis : { min : area.y1, max : area.y2 }
+										    });
+										  });
+										        
+										  // When graph is clicked, draw the graph with default area.
+										  Flotr.EventAdapter.observe(container, 'flotr:click', function () { graph = drawGraph(); });
+									}
+								});
+								
+								}		
+
+	function computeTabIssues() {
+	AJS.$
+								.ajax({
+									url : "/rest/reporter-rest/1.0/reporter-manager/getIssuesTimeList",
+									type : "GET",
+									dataType : "json",
+									success : function(iList) {
+										  var
+										    d1    = [],
+										    graph,
+										    x = 0, o;
+										  var container = document.getElementById("issues_graph");
+										for ( var i = 0; i < iList.length; ++i) {
+
+											    x = x+1;
+											    d1.push([iList[i], x]);
+											    
+										}
+										d1.push([iList[iList.length-1]+(3600*24*60*30), x]);
+										var options = {
+											    xaxis : {
+											      mode : 'time', 
+											      labelsAngle : 45
+											    },
+											    selection : {
+											      mode : 'x'
+											    },
+											    HtmlText : false,
+											    title : 'Number of issues over time'
+											  };
+										// Draw graph with default options, overwriting with passed options
+										  function drawGraph (opts) {
+
+										    // Clone the options, so the 'options' variable always keeps intact.
+										    o = Flotr._.extend(Flotr._.clone(options), opts || {});
+
+										    // Return a new graph.
+										    return Flotr.draw(
+										      container,
+										      [ d1 ],
+										      o
+										    );
+										  }
+
+										  graph = drawGraph();      
+										        
+										  Flotr.EventAdapter.observe(container, 'flotr:select', function(area){
+										    // Draw selected area
+										    graph = drawGraph({
+										      xaxis : { min : area.x1, max : area.x2, mode : 'time', labelsAngle : 45 },
+										      yaxis : { min : area.y1, max : area.y2 }
+										    });
+										  });
+										        
+										  // When graph is clicked, draw the graph with default area.
+										  Flotr.EventAdapter.observe(container, 'flotr:click', function () { graph = drawGraph(); });
+									}
+								});
+	}
+
+
+
+    </script>
+
+
+
+
+        ]]>
+
+	</Content>
+</Module>

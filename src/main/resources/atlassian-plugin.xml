@@ -1,0 +1,29 @@
+<atlassian-plugin key="ch.cern.its.InstanceReporter"
+	name="${project.name}" plugins-version="2">
+	<plugin-info>
+		<description>${project.description}</description>
+		<version>${project.version}</version>
+		<vendor name="By CERN ITS Team" url="http://www.cern.ch" />
+	</plugin-info>
+
+	<resource type="download" name="screenshot.png" location="/images/screenshot.png" />
+	<resource type="download" name="thumbnail.png" location="/images/thumbnail.png" />
+	
+
+	<resource type="i18n" location="i18n/i18n" name="i18n" />
+
+	<web-resource key="reporter-resources">
+		<resource type="download" name="flotr2.min.js" location="flotr2.min.js">
+			<property key="content-type" value="text/javascript" />
+		</resource>
+	</web-resource>
+
+	<rest key="rest-service-resources" path="/reporter-rest" version="1.0">
+		<description>Provides the REST resource for reporter management
+		</description>
+	</rest>
+
+	<gadget key="InstanceReporter-gadget" location="InstanceReporter-gadget.xml" />
+
+
+</atlassian-plugin>
