@@ -61,10 +61,12 @@ public class ReporterResource {
 		oldDate.set(1970, 2, 1);
 	}
 
+	
 	@GET
-	@Path("/preCompute")
-	public Response preCompute() {
+	@Path("/build")
+	public Response build() {
 		if (internalIsAuthorized()) {
+			
 			Collection<Project> allProjects = projectManager
 					.getProjectObjects();
 			projectTimes = new TreeSet<Long>();
@@ -168,22 +170,5 @@ public class ReporterResource {
 		return userUtil.getJiraAdministrators().contains(user)
 				|| userUtil.getJiraSystemAdministrators().contains(user);
 	}
-
-	// @GET
-	// @Path("/getJiraGroups")
-	// public Response getJiraGroups() {
-	// if (!internalIsAuthorized()) {
-	// return Response.noContent().build();
-	// }
-	// Collection<String> toReturn = new ArrayList<String>();
-	// toReturn.add(CREATE_JGROUP_LABEL);
-	//
-	// DefaultGroupManager groupManager = new DefaultGroupManager(crowdService);
-	// for (Group g : groupManager.getAllGroups()) {
-	// toReturn.add(g.getName());
-	// }
-	//
-	// return Response.ok(toReturn).cacheControl(NO_CACHE).build();
-	// }
-
+ 
 }

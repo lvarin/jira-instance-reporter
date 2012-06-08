@@ -137,7 +137,11 @@
 			<artifactId>sal-api</artifactId>
 			<version>2.1.beta4</version>
 		</dependency>
-		
+				<dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>11.2.0.3</version>
+</dependency>
     </dependencies>
 
     <build>

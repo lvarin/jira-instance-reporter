@@ -87,7 +87,7 @@
     <script type="text/javascript">
     AJS.$
 								.ajax({
-									url : "/rest/reporter-rest/1.0/reporter-manager/preCompute",
+									url : "/rest/reporter-rest/1.0/metric-manager/build",
 									type : "GET",
 									success : function(inutile) {
 							
@@ -97,12 +97,12 @@
 									
     function computeTabData() {
     		AJS.$.ajax({
-									url : "/rest/reporter-rest/1.0/reporter-manager/getNumberOfProjects",
+									url : "/rest/reporter-rest/1.0/metric-manager/getNumberOfProjects",
 									type : "GET",
 									dataType : "json",
 									success : function(nbProj) {
 										    AJS.$.ajax({
-											url : "/rest/reporter-rest/1.0/reporter-manager/getNumberOfIssues",
+											url : "/rest/reporter-rest/1.0/metric-manager/getNumberOfIssues",
 											type : "GET",
 											dataType : "json",
 											success : function(nbIssues) {
@@ -118,7 +118,7 @@
 	
 	AJS.$
 								.ajax({
-									url : "/rest/reporter-rest/1.0/reporter-manager/getProjectTimeList",
+									url : "/rest/reporter-rest/1.0/metric-manager/getProjectTimeList",
 									type : "GET",
 									dataType : "json",
 									success : function(pList) {
@@ -179,7 +179,7 @@
 	function computeTabIssues() {
 	AJS.$
 								.ajax({
-									url : "/rest/reporter-rest/1.0/reporter-manager/getIssuesTimeList",
+									url : "/rest/reporter-rest/1.0/metric-manager/getIssuesTimeList",
 									type : "GET",
 									dataType : "json",
 									success : function(iList) {
