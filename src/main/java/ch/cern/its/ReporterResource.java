@@ -33,6 +33,7 @@ import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 /**
  * REST endpoint for egroups gadget
  * 
+ * @deprecated Use MetricResource instead
  * @since v4.0
  */
 @Path("/reporter-manager")
@@ -61,12 +62,11 @@ public class ReporterResource {
 		oldDate.set(1970, 2, 1);
 	}
 
-	
 	@GET
 	@Path("/build")
 	public Response build() {
 		if (internalIsAuthorized()) {
-			
+
 			Collection<Project> allProjects = projectManager
 					.getProjectObjects();
 			projectTimes = new TreeSet<Long>();
@@ -170,5 +170,5 @@ public class ReporterResource {
 		return userUtil.getJiraAdministrators().contains(user)
 				|| userUtil.getJiraSystemAdministrators().contains(user);
 	}
- 
+
 }
