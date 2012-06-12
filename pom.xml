@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>ch.cern.its</groupId>
-    <artifactId>InstanceReporter</artifactId>
-    <version>1.0</version>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>ch.cern.its</groupId>
+	<artifactId>InstanceReporter</artifactId>
+	<version>1.0</version>
 
-    <organization>
-	<name>CERN</name>
-	<url>http://www.cern.ch/</url>
-    </organization>
+	<organization>
+		<name>CERN</name>
+		<url>http://www.cern.ch/</url>
+	</organization>
 
-    <name>InstanceReporter</name>
-    <description>This is the InstanceReporter plugin for Atlassian JIRA.</description>
-    <packaging>atlassian-plugin</packaging>
+	<name>InstanceReporter</name>
+	<description>This is the InstanceReporter plugin for Atlassian JIRA.</description>
+	<packaging>atlassian-plugin</packaging>
 
 	<parent>
 		<groupId>com.atlassian.jira.plugins</groupId>
@@ -24,56 +23,58 @@
 		<version>23</version>
 	</parent>
 
- <repositories>
-    <repository>
-      <id>Atlassian-repo</id>
-      <url>https://maven.atlassian.com/content/groups/public/</url>
-    </repository>
-  </repositories>
+	<repositories>
+		<repository>
+			<id>Atlassian-repo</id>
+			<url>https://maven.atlassian.com/content/groups/public/</url>
+		</repository>
+	</repositories>
 
- <pluginRepositories>
-    <pluginRepository>
-      <id>Atlassian-repo</id>
-      <url>https://maven.atlassian.com/content/groups/public/</url>
-    </pluginRepository>
-  </pluginRepositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>Atlassian-repo</id>
+			<url>https://maven.atlassian.com/content/groups/public/</url>
+		</pluginRepository>
+	</pluginRepositories>
 
 
-    <dependencies>
-        <dependency>
-            <groupId>com.atlassian.jira</groupId>
-            <artifactId>jira-api</artifactId>
-            <version>${jira.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- Add dependency on jira-core if you want access to JIRA implementation classes as well as the sanctioned API. -->
-        <!-- This is not normally recommended, but may be required eg when migrating a plugin originally developed against JIRA 4.x -->
-        
-        <dependency>
-            <groupId>com.atlassian.jira</groupId>
-            <artifactId>jira-core</artifactId>
-            <version>${jira.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.jira</groupId>
-            <artifactId>jira-tests</artifactId>
-            <version>${jira.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.atlassian.jira</groupId>
-            <artifactId>jira-func-tests</artifactId>
-            <version>${jira.version}</version>
-            <scope>test</scope>
-        </dependency>
+	<dependencies>
+		<dependency>
+			<groupId>com.atlassian.jira</groupId>
+			<artifactId>jira-api</artifactId>
+			<version>${jira.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- Add dependency on jira-core if you want access to JIRA implementation 
+			classes as well as the sanctioned API. -->
+		<!-- This is not normally recommended, but may be required eg when migrating 
+			a plugin originally developed against JIRA 4.x -->
+
+		<dependency>
+			<groupId>com.atlassian.jira</groupId>
+			<artifactId>jira-core</artifactId>
+			<version>${jira.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.jira</groupId>
+			<artifactId>jira-tests</artifactId>
+			<version>${jira.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.atlassian.jira</groupId>
+			<artifactId>jira-func-tests</artifactId>
+			<version>${jira.version}</version>
+			<scope>test</scope>
+		</dependency>
 
 
 
@@ -137,39 +138,34 @@
 			<artifactId>sal-api</artifactId>
 			<version>2.1.beta4</version>
 		</dependency>
-				<dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-            <version>11.2.0.3</version>
-</dependency>
-    </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-jira-plugin</artifactId>
-                <version>3.7.2</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <productVersion>${jira.version}</productVersion>
-                    <productDataVersion>${jira.version}</productDataVersion>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+	</dependencies>
 
-    <properties>
-        <!-- TODO: Update to 5.0 after release of 5.0 final -->
-        <jira.version>5.0</jira.version>
-        <amps.version>3.7.2</amps.version>
-    </properties>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.atlassian.maven.plugins</groupId>
+				<artifactId>maven-jira-plugin</artifactId>
+				<version>3.7.2</version>
+				<extensions>true</extensions>
+				<configuration>
+					<productVersion>${jira.version}</productVersion>
+					<productDataVersion>${jira.version}</productDataVersion>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<properties>
+		<jira.version>5.0</jira.version>
+		<amps.version>3.7.2</amps.version>
+	</properties>
 
 </project>

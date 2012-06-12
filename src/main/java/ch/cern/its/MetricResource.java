@@ -2,9 +2,7 @@ package ch.cern.its;
 
 import static com.atlassian.jira.rest.v1.util.CacheControl.NO_CACHE;
 
-import java.io.File;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -18,27 +16,24 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import oracle.jdbc.driver.OracleDriver;
 
 import org.apache.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
+import com.atlassian.config.bootstrap.AtlassianBootstrapManager;
+import com.atlassian.config.bootstrap.DefaultAtlassianBootstrapManager;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.ComponentManager;
 import com.atlassian.jira.bc.issue.search.SearchService;
-import com.atlassian.jira.project.version.VersionManager;
+import com.atlassian.jira.config.database.DatabaseConfigurationManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.util.UserUtil;
-import com.atlassian.jira.util.velocity.VelocityRequestContextFactory;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 
 /**
- * REST endpoint for egroups gadget
+ * REST endpoint for Reporter Gadget Provides some method to access metrics
+ * about the instance (ex : number of projects, issues over time, ...).
  * 
+ * @author CERN ITS team
  * @since v4.0
  */
 @Path("/metric-manager")
@@ -46,50 +41,27 @@ import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 @Produces({ MediaType.APPLICATION_JSON })
 public class MetricResource {
 	private final static Logger log = Logger.getLogger(MetricResource.class);
-	private final static String dbConfigPath = "/var/jira-home/dbconfig.xml";
 	private List<Long> projectTimes;
 	private List<Long> issueTimes;
 	private int nbIssues = 0;
 	private int nbProjects = 0;
-	private String jiraDbURL;
-	private String jiraDbUser;
-	private String jiraDbPassword;
 	private final long tOld;
 	private final JiraAuthenticationContext authenticationContext;
+	private final DatabaseConfigurationManager dbConfigManager;
+	private final AtlassianBootstrapManager bootstrapManager;
 
 	public MetricResource(final SearchService searchService,
-			final JiraAuthenticationContext authenticationContext,
-			final VelocityRequestContextFactory velocityRequestContextFactory,
-			final VersionManager versionManager) {
+			final JiraAuthenticationContext authenticationContext) {
 		this.authenticationContext = authenticationContext;
+		this.dbConfigManager = ComponentManager
+				.getComponent(DatabaseConfigurationManager.class);
+		// TODO probably not the right way to do that.
+		this.bootstrapManager = new DefaultAtlassianBootstrapManager();
+		
 		Calendar oldDate = Calendar.getInstance();
 		oldDate.set(1970, 2, 1);
 		tOld = oldDate.getTime().getTime();
-		// dbconfig infos
 
-		try {
-			File file = new File(dbConfigPath);
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document doc = db.parse(file);
-			Element root = doc.getDocumentElement();
-			root.normalize();
-			jiraDbURL = root.getElementsByTagName("url").item(0)
-					.getTextContent();
-			jiraDbUser = root.getElementsByTagName("username").item(0)
-					.getTextContent();
-			jiraDbPassword = root.getElementsByTagName("password").item(0)
-					.getTextContent();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		// driver for oracle db
-		try {
-			DriverManager.registerDriver(new OracleDriver());
-		} catch (Exception e) {
-			log.error(e.getMessage());
-		}
 	}
 
 	@GET
@@ -101,8 +73,8 @@ public class MetricResource {
 		HashMap<String, Long> projects = new HashMap<String, Long>();
 		issueTimes = new ArrayList<Long>();
 		try {
-			Connection conn = DriverManager.getConnection(jiraDbURL,
-					jiraDbUser, jiraDbPassword);
+			Connection conn = dbConfigManager.getDatabaseConfiguration()
+					.getDatasource().getConnection(bootstrapManager);
 			String sql = "select created, updated, project  from jiraissue";
 			Statement stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);

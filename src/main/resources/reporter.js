@@ -19,7 +19,11 @@ function populateTabData() {
 			});
 };
 
-// inspired by flotr2 examples
+/*
+ * inspired by flotr2 examples
+ * list actually contains timestamps
+ * each entry = +1 in quantity on the x axis
+ */
 function drawGraphOverTime(list, container, title) {
 	var d1 = [], graph, x = 0, o;
 
@@ -79,7 +83,7 @@ function initReporter() {
 	AJS.$.ajax({
 		url : "/rest/reporter-rest/1.0/metric-manager/build",
 		type : "GET",
-		success : function(inutile) {
+		success : function() {
 			populateTabProjects();
 		}
 	});
