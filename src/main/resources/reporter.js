@@ -103,7 +103,7 @@ function initReporter() {
 function populateTabProjects() {
 
 	AJS.$.ajax({
-		url : "/rest/reporter-rest/1.0/metric-manager/getProjectTimeList",
+		url : "/rest/reporter-rest/1.0/metric-manager/getProjectsDates",
 		type : "GET",
 		dataType : "json",
 		success : function(pList) {
@@ -117,7 +117,7 @@ function populateTabProjects() {
 
 function populateTabIssues() {
 	AJS.$.ajax({
-		url : "/rest/reporter-rest/1.0/metric-manager/getIssuesTimeList",
+		url : "/rest/reporter-rest/1.0/metric-manager/getIssuesDates",
 		type : "GET",
 		dataType : "json",
 		success : function(iList) {
@@ -129,7 +129,7 @@ function populateTabIssues() {
 
 function populateTabUsers() {
 	AJS.$.ajax({
-		url : "/rest/reporter-rest/1.0/metric-manager/getUsersTimeList",
+		url : "/rest/reporter-rest/1.0/metric-manager/getUsersDates",
 		type : "GET",
 		dataType : "json",
 		success : function(uList) {

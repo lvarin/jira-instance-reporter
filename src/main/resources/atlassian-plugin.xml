@@ -18,7 +18,7 @@
 		</resource>
 
 	</web-resource>
-	<web-resource key="reporter-resourcesjs">
+	<web-resource key="reporter-js">
 		<dependency>ch.cern.its.InstanceReporter:reporter-resources</dependency>
 		<resource type="download" name="reporter.js" location="reporter.js">
 			<property key="content-type" value="text/javascript" />

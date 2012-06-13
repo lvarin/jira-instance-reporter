@@ -41,13 +41,17 @@ import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 @Produces({ MediaType.APPLICATION_JSON })
 public class MetricResource {
 	private final static Logger log = Logger.getLogger(MetricResource.class);
-	private List<Long> projectTimes;
-	private List<Long> issueTimes;
-	private List<Long> userTimes;
+
+	private List<Long> projectsDates;
+	private List<Long> issuesDates;
+	private List<Long> usersDates;
+
 	private int nbIssues = 0;
 	private int nbProjects = 0;
 	private int nbUsers = 0;
-	private final long tOld;
+
+	private final long tOld;// timestamp of 01/02/1970
+
 	private final JiraAuthenticationContext authenticationContext;
 	private final DatabaseConfigurationManager dbConfigManager;
 	private final AtlassianBootstrapManager bootstrapManager;
@@ -60,12 +64,20 @@ public class MetricResource {
 		// TODO probably not the right way to do that.
 		this.bootstrapManager = new DefaultAtlassianBootstrapManager();
 
+		// we are using "tOld" as a trick for imported entities
+		// who have no "created" date set (then we use "updated").
 		Calendar oldDate = Calendar.getInstance();
 		oldDate.set(1970, 2, 1);
 		tOld = oldDate.getTime().getTime();
 
 	}
 
+	/**
+	 * This method is called to build (or refresh) inner data (all data that are
+	 * provided via rest endpoints)
+	 * 
+	 * @return null
+	 */
 	@GET
 	@Path("/build")
 	public Response build() {
@@ -73,8 +85,8 @@ public class MetricResource {
 		String pKey = null;
 		Long tProj = null;
 		HashMap<String, Long> projects = new HashMap<String, Long>();
-		issueTimes = new ArrayList<Long>();
-		userTimes = new ArrayList<Long>();
+		issuesDates = new ArrayList<Long>();
+		usersDates = new ArrayList<Long>();
 
 		try {
 			Connection conn = dbConfigManager.getDatabaseConfiguration()
@@ -89,7 +101,7 @@ public class MetricResource {
 				if (t < tOld) {
 					t = rs.getDate(2).getTime();
 				}
-				issueTimes.add(t);
+				issuesDates.add(t);
 				pKey = rs.getString(3);
 				// t is the date of creation of the issue
 				if ((tProj = projects.get(pKey)) == null) {
@@ -102,6 +114,7 @@ public class MetricResource {
 			}
 
 			// looking for users info
+			// TODO take only active users ?
 			sql = "select created_date, updated_date  from cwd_user";
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(sql);
@@ -110,25 +123,30 @@ public class MetricResource {
 				if (t < tOld) {
 					t = rs.getDate(2).getTime();
 				}
-				userTimes.add(t);
+				usersDates.add(t);
 			}
 
 			conn.close();
 
-			projectTimes = new ArrayList<Long>(projects.values());
-			Collections.sort(projectTimes);
-			Collections.sort(issueTimes);
-			Collections.sort(userTimes);
+			projectsDates = new ArrayList<Long>(projects.values());
+			Collections.sort(projectsDates);
+			Collections.sort(issuesDates);
+			Collections.sort(usersDates);
 
-			nbIssues = issueTimes.size();
-			nbProjects = projectTimes.size();
-			nbUsers = userTimes.size();
+			nbIssues = issuesDates.size();
+			nbProjects = projectsDates.size();
+			nbUsers = usersDates.size();
 		} catch (Exception e) {
 			log.error("SQL Error : " + e.getMessage());
 		}
 		return null;
 	}
 
+	/**
+	 * If user is not administrator, no content is returned
+	 * 
+	 * @return number of projects with at least one issue
+	 */
 	@GET
 	@Path("/getNumberOfProjects")
 	public Response getNumberOfProjects() {
@@ -138,6 +156,11 @@ public class MetricResource {
 		return Response.ok(nbProjects).cacheControl(NO_CACHE).build();
 	}
 
+	/**
+	 * If user is not administrator, no content is returned
+	 * 
+	 * @return number of users in CWD_USER table
+	 */
 	@GET
 	@Path("/getNumberOfUsers")
 	public Response getNumberOfUsers() {
@@ -147,6 +170,11 @@ public class MetricResource {
 		return Response.ok(nbUsers).cacheControl(NO_CACHE).build();
 	}
 
+	/**
+	 * If user is not administrator, no content is returned
+	 * 
+	 * @return total number of issues
+	 */
 	@GET
 	@Path("/getNumberOfIssues")
 	public Response getNumberOfIssues() {
@@ -156,33 +184,55 @@ public class MetricResource {
 		return Response.ok(nbIssues).cacheControl(NO_CACHE).build();
 	}
 
+	/**
+	 * If user is not administrator, no content is returned
+	 * 
+	 * @return sorted list of dates corresponding to User creation
+	 *         (usersDates.size() --> number of users)
+	 */
 	@GET
-	@Path("/getUsersTimeList")
-	public Response getUsersTimeList() {
+	@Path("/getUsersDates")
+	public Response getUsersDates() {
 		if (!internalIsAuthorized()) {
 			return Response.noContent().build();
 		}
-		return Response.ok(userTimes).cacheControl(NO_CACHE).build();
+		return Response.ok(usersDates).cacheControl(NO_CACHE).build();
 	}
 
+	/**
+	 * If user is not administrator, no content is returned. Project date
+	 * creation is estimated with its oldest issue creation date
+	 * 
+	 * @return sorted list of dates corresponding to Project creation
+	 *         (projectsDates.size() --> number of projects)
+	 */
 	@GET
-	@Path("/getProjectTimeList")
-	public Response getProjectTimeList() {
+	@Path("/getProjectsDates")
+	public Response getProjectsDates() {
 		if (!internalIsAuthorized()) {
 			return Response.noContent().build();
 		}
-		return Response.ok(projectTimes).cacheControl(NO_CACHE).build();
+		return Response.ok(projectsDates).cacheControl(NO_CACHE).build();
 	}
 
+	/**
+	 * If user is not administrator, no content is returned
+	 * 
+	 * @return sorted list of dates corresponding to issues creation
+	 *         (issuesDates.size() --> number of issues)
+	 */
 	@GET
-	@Path("/getIssuesTimeList")
-	public Response getIssuesTimeList() {
+	@Path("/getIssuesDates")
+	public Response getIssuesDates() {
 		if (!internalIsAuthorized()) {
 			return Response.noContent().build();
 		}
-		return Response.ok(issueTimes).cacheControl(NO_CACHE).build();
+		return Response.ok(issuesDates).cacheControl(NO_CACHE).build();
 	}
 
+	/**
+	 * @return true if logged in user is administrator, else false
+	 */
 	private boolean internalIsAuthorized() {
 		User user = authenticationContext.getLoggedInUser();
 		UserUtil userUtil = ComponentManager.getInstance().getUserUtil();

@@ -2,10 +2,11 @@
 <Module>
 	<ModulePrefs title="__MSG_gadget.cern.reporter.title__"
 		directory_title="__MSG_gadget.cern.reporter.title__" description="__MSG_gadget.cern.reporter.description__"
-		author="CERN ITS Team">
-		<!-- screenshot='#staticResourceUrl("ch.cern.plugins.egroups.egroups-gadget:egroups-gadget", 
-			"screenshot.png")' thumbnail='#staticResourceUrl("ch.cern.plugins.egroups.egroups-gadget:egroups-gadget", 
-			"thumbnail.png")' -->
+		author="CERN ITS Team"
+		screenshot='#staticResourceUrl("ch.cern.its.InstanceReporter:InstanceReporter-gadget", 
+			"screenshot.png")'
+		thumbnail='#staticResourceUrl("ch.cern.its.InstanceReporter:InstanceReporter-gadget", 
+			"thumbnail.png")'>
 
 		<Require feature="dynamic-height" />
 		<Require feature="minimessage" />
@@ -29,8 +30,7 @@
  
      <![CDATA[
 #requireResource("com.atlassian.jira.gadgets:common")
-#requireResource("ch.cern.its.InstanceReporter:reporter-resources")
-#requireResource("ch.cern.its.InstanceReporter:reporter-resourcesjs")
+#requireResource("ch.cern.its.InstanceReporter:reporter-js")
 
 #includeResources()
 
@@ -52,13 +52,13 @@
 		<div class="aui-tabs horizontal-tabs" id="tabs-reporter">
 		    <ul class="tabs-menu">
 		        <li class="menu-item active-tab">
-		            <a href="#tabs-projects"><strong>Number of projects over time</strong></a>
+		            <a href="#tabs-projects"><strong>Projects</strong></a>
 		        </li>
 		        <li class="menu-item">
-		            <a href="#tabs-issues" onClick="populateTabIssues();"><strong>Number of issues over time</strong></a>
+		            <a href="#tabs-issues" onClick="populateTabIssues();"><strong>Issues</strong></a>
 		        </li>
 		    	<li class="menu-item">
-		            <a href="#tabs-users" onClick="populateTabUsers();"><strong>Number of users over time</strong></a>
+		            <a href="#tabs-users" onClick="populateTabUsers();"><strong>Users</strong></a>
 		        </li>
 		        <li class="menu-item">
 		            <a href="#tabs-data" onClick="populateTabData();"><strong>Data summary</strong></a>
