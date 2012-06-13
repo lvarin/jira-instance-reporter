@@ -43,8 +43,10 @@ public class MetricResource {
 	private final static Logger log = Logger.getLogger(MetricResource.class);
 	private List<Long> projectTimes;
 	private List<Long> issueTimes;
+	private List<Long> userTimes;
 	private int nbIssues = 0;
 	private int nbProjects = 0;
+	private int nbUsers = 0;
 	private final long tOld;
 	private final JiraAuthenticationContext authenticationContext;
 	private final DatabaseConfigurationManager dbConfigManager;
@@ -57,7 +59,7 @@ public class MetricResource {
 				.getComponent(DatabaseConfigurationManager.class);
 		// TODO probably not the right way to do that.
 		this.bootstrapManager = new DefaultAtlassianBootstrapManager();
-		
+
 		Calendar oldDate = Calendar.getInstance();
 		oldDate.set(1970, 2, 1);
 		tOld = oldDate.getTime().getTime();
@@ -67,43 +69,60 @@ public class MetricResource {
 	@GET
 	@Path("/build")
 	public Response build() {
-		Long tIssue = null;
+		Long t = null;
 		String pKey = null;
 		Long tProj = null;
 		HashMap<String, Long> projects = new HashMap<String, Long>();
 		issueTimes = new ArrayList<Long>();
+		userTimes = new ArrayList<Long>();
+
 		try {
 			Connection conn = dbConfigManager.getDatabaseConfiguration()
 					.getDatasource().getConnection(bootstrapManager);
+
+			// looking for issues and projects infos
 			String sql = "select created, updated, project  from jiraissue";
 			Statement stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 			while (rs.next()) {
-				tIssue = rs.getDate(1).getTime();
-				// System.out.println(i++);
-				if (tIssue < tOld) {
-					tIssue = rs.getDate(2).getTime();
+				t = rs.getDate(1).getTime();
+				if (t < tOld) {
+					t = rs.getDate(2).getTime();
 				}
-				issueTimes.add(tIssue);
-				// System.out.println(issueTimes.size());
+				issueTimes.add(t);
 				pKey = rs.getString(3);
-				// tIssue is the date of creation of the issue
+				// t is the date of creation of the issue
 				if ((tProj = projects.get(pKey)) == null) {
-					projects.put(pKey, tIssue);
+					projects.put(pKey, t);
 				} else {
-					if (tIssue < tProj) {
-						projects.put(pKey, tIssue);
+					if (t < tProj) {
+						projects.put(pKey, t);
 					}
 				}
 			}
+
+			// looking for users info
+			sql = "select created_date, updated_date  from cwd_user";
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				t = rs.getDate(1).getTime();
+				if (t < tOld) {
+					t = rs.getDate(2).getTime();
+				}
+				userTimes.add(t);
+			}
+
 			conn.close();
 
 			projectTimes = new ArrayList<Long>(projects.values());
 			Collections.sort(projectTimes);
 			Collections.sort(issueTimes);
+			Collections.sort(userTimes);
 
 			nbIssues = issueTimes.size();
 			nbProjects = projectTimes.size();
+			nbUsers = userTimes.size();
 		} catch (Exception e) {
 			log.error("SQL Error : " + e.getMessage());
 		}
@@ -120,12 +139,30 @@ public class MetricResource {
 	}
 
 	@GET
+	@Path("/getNumberOfUsers")
+	public Response getNumberOfUsers() {
+		if (!internalIsAuthorized()) {
+			return Response.noContent().build();
+		}
+		return Response.ok(nbUsers).cacheControl(NO_CACHE).build();
+	}
+
+	@GET
 	@Path("/getNumberOfIssues")
 	public Response getNumberOfIssues() {
 		if (!internalIsAuthorized()) {
 			return Response.noContent().build();
 		}
 		return Response.ok(nbIssues).cacheControl(NO_CACHE).build();
+	}
+
+	@GET
+	@Path("/getUsersTimeList")
+	public Response getUsersTimeList() {
+		if (!internalIsAuthorized()) {
+			return Response.noContent().build();
+		}
+		return Response.ok(userTimes).cacheControl(NO_CACHE).build();
 	}
 
 	@GET

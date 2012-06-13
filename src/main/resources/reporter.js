@@ -11,8 +11,20 @@ function populateTabData() {
 								type : "GET",
 								dataType : "json",
 								success : function(nbIssues) {
-									document.getElementById("nb_proj").innerHTML = nbProj;
-									document.getElementById("nb_issues").innerHTML = nbIssues;
+									AJS.$
+											.ajax({
+												url : "/rest/reporter-rest/1.0/metric-manager/getNumberOfUsers",
+												type : "GET",
+												dataType : "json",
+												success : function(nbUsers) {
+													document
+															.getElementById("nb_users").innerHTML = nbUsers;
+													document
+															.getElementById("nb_proj").innerHTML = nbProj;
+													document
+															.getElementById("nb_issues").innerHTML = nbIssues;
+												}
+											});
 								}
 							});
 				}
@@ -20,9 +32,8 @@ function populateTabData() {
 };
 
 /*
- * inspired by flotr2 examples
- * list actually contains timestamps
- * each entry = +1 in quantity on the x axis
+ * inspired by flotr2 examples list actually contains timestamps each entry = +1
+ * in quantity on the x axis
  */
 function drawGraphOverTime(list, container, title) {
 	var d1 = [], graph, x = 0, o;
@@ -112,6 +123,18 @@ function populateTabIssues() {
 		success : function(iList) {
 			drawGraphOverTime(iList, document.getElementById("issues_graph"),
 					"Number of issues over time");
+		}
+	});
+};
+
+function populateTabUsers() {
+	AJS.$.ajax({
+		url : "/rest/reporter-rest/1.0/metric-manager/getUsersTimeList",
+		type : "GET",
+		dataType : "json",
+		success : function(uList) {
+			drawGraphOverTime(uList, document.getElementById("users_graph"),
+					"Number of users over time");
 		}
 	});
 };
