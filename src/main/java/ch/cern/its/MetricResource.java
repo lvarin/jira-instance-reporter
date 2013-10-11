@@ -150,9 +150,10 @@ public class MetricResource {
 	@GET
 	@Path("/getNumberOfProjects")
 	public Response getNumberOfProjects() {
-		if (!internalIsAuthorized()) {
+/*		if (!internalIsAuthorized()) {
 			return Response.noContent().build();
 		}
+*/
 		return Response.ok(nbProjects).cacheControl(NO_CACHE).build();
 	}
 
@@ -164,9 +165,10 @@ public class MetricResource {
 	@GET
 	@Path("/getNumberOfUsers")
 	public Response getNumberOfUsers() {
-		if (!internalIsAuthorized()) {
+/*		if (!internalIsAuthorized()) {
 			return Response.noContent().build();
 		}
+*/
 		return Response.ok(nbUsers).cacheControl(NO_CACHE).build();
 	}
 

@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ch.cern.its</groupId>
 	<artifactId>InstanceReporter</artifactId>
-	<version>1.0</version>
+	<version>1.1</version>
 
 	<organization>
 		<name>CERN</name>
