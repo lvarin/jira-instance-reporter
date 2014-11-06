@@ -164,8 +164,8 @@
 	</build>
 
 	<properties>
-		<jira.version>5.0</jira.version>
-		<amps.version>3.7.2</amps.version>
+		<jira.version>6.3.8</jira.version>
+		<amps.version>5.0.4</amps.version>
 	</properties>
 
 </project>
