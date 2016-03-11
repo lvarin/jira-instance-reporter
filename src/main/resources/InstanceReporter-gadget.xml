@@ -84,11 +84,13 @@
 		    <div class="tabs-pane" id="tabs-data">
 		        <div id ="data_instance">
 		        	<center>
-						<strong>Number of projects : </strong> <span id="nb_proj"></span> 
+						<strong>Number of projects:</strong><span id="nb_proj"></span>
 						<br/>
-						<strong>Number of issues : </strong><span id="nb_issues"></span>
+						<strong>Number of issues:</strong><span id="nb_issues"></span>
 						<br/>
-						<strong>Number of users : </strong><span id="nb_users"></span>
+						<strong>Number of users (active):</strong><span id="nb_active_users"></span>
+                                                <br/>
+						<strong>Number of users (total):</strong><span id="nb_users"></span>
 					</center>
 		        </div>
 		    </div>

@@ -17,8 +17,16 @@ function populateTabData() {
                   type: "GET",
                   dataType: "json",
                   success: function(nbUsers) {
+                  AJS.$
+                .ajax({
+                  url: "/rest/reporter-rest/1.0/metric-manager/getNumberOfActiveUsers",
+                  type: "GET",
+                  dataType: "json",
+                  success: function(nbActiveUsers) {
                     document
                       .getElementById("nb_users").innerHTML = nbUsers;
+                    document
+                      .getElementById("nb_active_users").innerHTML = nbActiveUsers;
                     document
                       .getElementById("nb_proj").innerHTML = nbProj;
                     document
@@ -29,6 +37,8 @@ function populateTabData() {
           });
       }
     });
+}
+});
 };
 
 /*

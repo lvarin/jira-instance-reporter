@@ -19,6 +19,9 @@ import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 
+import com.atlassian.jira.component.ComponentAccessor;
+
+
 import com.atlassian.config.bootstrap.AtlassianBootstrapManager;
 import com.atlassian.config.bootstrap.DefaultAtlassianBootstrapManager;
 import com.atlassian.crowd.embedded.api.User;
@@ -29,6 +32,7 @@ import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.config.database.DatabaseConfigurationManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.user.util.UserUtil;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 
 /**
@@ -51,6 +55,7 @@ public class MetricResource {
 	private int nbIssues = 0;
 	private int nbProjects = 0;
 	private int nbUsers = 0;
+	private int nbActiveUsers = 0;
 
 	private final long tOld;// timestamp of 01/02/1970
 
@@ -130,6 +135,17 @@ public class MetricResource {
 
 			conn.close();
 
+                        //Looking for active users
+                        sql = "select count(*) from cwd_user where active=1";
+                        stmt = conn.createStatement();
+                        rs = stmt.executeQuery(sql);
+                        if (rs.next()) {
+                                nbActiveUsers = rs.getInt("rowcount");
+                        }
+
+                        conn.close();
+
+
 			projectsDates = new ArrayList<Long>(projects.values());
 			Collections.sort(projectsDates);
 			Collections.sort(issuesDates);
@@ -161,7 +177,7 @@ public class MetricResource {
 
 	/**
 	 * If user is not administrator, no content is returned
-	 * 
+	 *
 	 * @return number of users in CWD_USER table
 	 */
 	@GET
@@ -173,6 +189,21 @@ public class MetricResource {
 */
 		return Response.ok(nbUsers).cacheControl(NO_CACHE).build();
 	}
+
+        /**
+         * If user is not administrator, no content is returned
+         *
+         * @return number of users in CWD_USER table
+         */
+        @GET
+        @Path("/getNumberOfActiveUsers")
+        public Response getNumberOfActiveUsers() {
+/*              if (!internalIsAuthorized()) {
+                        return Response.noContent().build();
+                }
+ *                                                      */
+                return Response.ok(nbActiveUsers).cacheControl(NO_CACHE).build();
+        }
 
 	/**
 	 * If user is not administrator, no content is returned
@@ -240,6 +271,7 @@ public class MetricResource {
 	private boolean internalIsAuthorized() {
 		ApplicationUser user = authenticationContext.getLoggedInUser();
 		UserUtil userUtil = ComponentAccessor.getUserUtil();
+//		UserUtil userUtil = ComponentManager.getInstance().getUserUtil();
 		return userUtil.getJiraAdministrators().contains(user)
 				|| userUtil.getJiraSystemAdministrators().contains(user);
 	}
