@@ -22,7 +22,9 @@ import org.apache.log4j.Logger;
 import com.atlassian.config.bootstrap.AtlassianBootstrapManager;
 import com.atlassian.config.bootstrap.DefaultAtlassianBootstrapManager;
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.ComponentManager;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.config.database.DatabaseConfigurationManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
@@ -236,8 +238,8 @@ public class MetricResource {
 	 * @return true if logged in user is administrator, else false
 	 */
 	private boolean internalIsAuthorized() {
-		User user = authenticationContext.getLoggedInUser();
-		UserUtil userUtil = ComponentManager.getInstance().getUserUtil();
+		ApplicationUser user = authenticationContext.getLoggedInUser();
+		UserUtil userUtil = ComponentAccessor.getUserUtil();
 		return userUtil.getJiraAdministrators().contains(user)
 				|| userUtil.getJiraSystemAdministrators().contains(user);
 	}
