@@ -3,9 +3,9 @@
 	<ModulePrefs title="__MSG_gadget.cern.reporter.title__"
 		directory_title="__MSG_gadget.cern.reporter.title__" description="__MSG_gadget.cern.reporter.description__"
 		author="CERN ITS Team"
-		screenshot='#staticResourceUrl("ch.cern.its.InstanceReporter:InstanceReporter-gadget", 
+		screenshot='#staticResourceUrl("ch.cern.its.InstanceReporter:InstanceReporter-gadget",
 			"screenshot.png")'
-		thumbnail='#staticResourceUrl("ch.cern.its.InstanceReporter:InstanceReporter-gadget", 
+		thumbnail='#staticResourceUrl("ch.cern.its.InstanceReporter:InstanceReporter-gadget",
 			"thumbnail.png")'>
 
 		<Require feature="dynamic-height" />
@@ -27,7 +27,7 @@
 	<UserPref name="isConfigured" datatype="hidden" default_value="false" />
 	<Content type="html">
 
- 
+
      <![CDATA[
 #requireResource("com.atlassian.jira.gadgets:common")
 #requireResource("ch.cern.its.InstanceReporter:reporter-js")
@@ -63,36 +63,38 @@
 		        <li class="menu-item">
 		            <a href="#tabs-data" onClick="populateTabData();"><strong>Data summary</strong></a>
 		        </li>
-	
+
 		    </ul>
-		    
+
 		    <div class="tabs-pane active-pane" id="tabs-projects">
 		        <br/>
 		        <div id="projects_graph" style="height:500px;"></div>
 		    </div>
-		    
+
 		    <div class="tabs-pane" id="tabs-issues">
 		        <br/>
 		        <div id="issues_graph" style="height:500px;"></div>
 		    </div>
-		    		    
+
 		    <div class="tabs-pane" id="tabs-users">
 		        <br/>
 		        <div id="users_graph" style="height:500px;"></div>
 		    </div>
-		    
+
 		    <div class="tabs-pane" id="tabs-data">
 		        <div id ="data_instance">
 		        	<center>
-						<strong>Number of projects : </strong> <span id="nb_proj"></span> 
+						<strong>Number of projects: </strong> <span id="nb_proj"></span>
 						<br/>
-						<strong>Number of issues : </strong><span id="nb_issues"></span>
+						<strong>Number of issues: </strong><span id="nb_issues"></span>
 						<br/>
-						<strong>Number of users : </strong><span id="nb_users"></span>
+						<strong>Number of users (active): </strong><span id="nb_active_users"></span>
+            <br/>
+            <strong>Number of users: </strong><span id="nb_users"></span>
 					</center>
 		        </div>
 		    </div>
-		    
+
 		</div>
 
     <script type="text/javascript">
