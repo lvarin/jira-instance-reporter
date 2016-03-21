@@ -198,21 +198,6 @@ public class MetricResource {
 		return Response.ok(nbUsers).cacheControl(NO_CACHE).build();
 	}
 
-        /**
-         * If user is not administrator, no content is returned
-         *
-         * @return number of users in CWD_USER table
-         */
-        @GET
-        @Path("/getNumberOfActiveUsers")
-        public Response getNumberOfActiveUsers() {
-/*              if (!internalIsAuthorized()) {
-                        return Response.noContent().build();
-                }
- *                                                      */
-                return Response.ok(nbActiveUsers).cacheControl(NO_CACHE).build();
-        }
-
 	/**
 	 * If user is not administrator, no content is returned
 	 *
