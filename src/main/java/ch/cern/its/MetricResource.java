@@ -38,7 +38,7 @@ import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 /**
  * REST endpoint for Reporter Gadget Provides some method to access metrics
  * about the instance (ex : number of projects, issues over time, ...).
- * 
+ *
  * @author CERN ITS team
  * @since v4.0
  */
@@ -55,7 +55,7 @@ public class MetricResource {
 	private int nbIssues = 0;
 	private int nbProjects = 0;
 	private int nbUsers = 0;
-	private int nbActiveUsers = 0;
+  private int nbActiveUsers = 0;
 
 	private final long tOld;// timestamp of 01/02/1970
 
@@ -82,7 +82,7 @@ public class MetricResource {
 	/**
 	 * This method is called to build (or refresh) inner data (all data that are
 	 * provided via rest endpoints)
-	 * 
+	 *
 	 * @return null
 	 */
 	@GET
@@ -121,7 +121,6 @@ public class MetricResource {
 			}
 
 			// looking for users info
-			// TODO take only active users ?
 			sql = "select created_date, updated_date  from cwd_user";
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(sql);
@@ -131,6 +130,14 @@ public class MetricResource {
 					t = rs.getDate(2).getTime();
 				}
 				usersDates.add(t);
+			}
+
+			// looking for users info
+			sql = "SELECT COUNT(*) AS count FROM cwd_user WHERE active='1'";
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				nbActiveUsers = rs.getInt("count");
 			}
 
 			conn.close();
@@ -154,6 +161,7 @@ public class MetricResource {
 			nbIssues = issuesDates.size();
 			nbProjects = projectsDates.size();
 			nbUsers = usersDates.size();
+
 		} catch (Exception e) {
 			log.error("SQL Error : " + e.getMessage());
 		}
@@ -162,7 +170,7 @@ public class MetricResource {
 
 	/**
 	 * If user is not administrator, no content is returned
-	 * 
+	 *
 	 * @return number of projects with at least one issue
 	 */
 	@GET
@@ -207,7 +215,22 @@ public class MetricResource {
 
 	/**
 	 * If user is not administrator, no content is returned
-	 * 
+	 *
+	 * @return number of active users in CWD_USER table
+	 */
+	@GET
+	@Path("/getNumberOfActiveUsers")
+	public Response getNumberOfActiveUsers() {
+/*		if (!internalIsAuthorized()) {
+			return Response.noContent().build();
+		}
+*/
+		return Response.ok(nbActiveUsers).cacheControl(NO_CACHE).build();
+	}
+
+	/**
+	 * If user is not administrator, no content is returned
+	 *
 	 * @return total number of issues
 	 */
 	@GET
@@ -221,7 +244,7 @@ public class MetricResource {
 
 	/**
 	 * If user is not administrator, no content is returned
-	 * 
+	 *
 	 * @return sorted list of dates corresponding to User creation
 	 *         (usersDates.size() --> number of users)
 	 */
@@ -237,7 +260,7 @@ public class MetricResource {
 	/**
 	 * If user is not administrator, no content is returned. Project date
 	 * creation is estimated with its oldest issue creation date
-	 * 
+	 *
 	 * @return sorted list of dates corresponding to Project creation
 	 *         (projectsDates.size() --> number of projects)
 	 */
@@ -252,7 +275,7 @@ public class MetricResource {
 
 	/**
 	 * If user is not administrator, no content is returned
-	 * 
+	 *
 	 * @return sorted list of dates corresponding to issues creation
 	 *         (issuesDates.size() --> number of issues)
 	 */
@@ -271,7 +294,6 @@ public class MetricResource {
 	private boolean internalIsAuthorized() {
 		ApplicationUser user = authenticationContext.getLoggedInUser();
 		UserUtil userUtil = ComponentAccessor.getUserUtil();
-//		UserUtil userUtil = ComponentManager.getInstance().getUserUtil();
 		return userUtil.getJiraAdministrators().contains(user)
 				|| userUtil.getJiraSystemAdministrators().contains(user);
 	}
