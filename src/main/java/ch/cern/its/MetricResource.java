@@ -16,11 +16,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.log4j.Logger;
 
 import com.atlassian.jira.component.ComponentAccessor;
-
 
 import com.atlassian.config.bootstrap.AtlassianBootstrapManager;
 import com.atlassian.config.bootstrap.DefaultAtlassianBootstrapManager;
@@ -140,18 +140,7 @@ public class MetricResource {
 				nbActiveUsers = rs.getInt("count");
 			}
 
-			conn.close();
-
-                        //Looking for active users
-                        sql = "select count(*) from cwd_user where active=1";
-                        stmt = conn.createStatement();
-                        rs = stmt.executeQuery(sql);
-                        if (rs.next()) {
-                                nbActiveUsers = rs.getInt("rowcount");
-                        }
-
-                        conn.close();
-
+      conn.close();
 
 			projectsDates = new ArrayList<Long>(projects.values());
 			Collections.sort(projectsDates);
@@ -163,9 +152,10 @@ public class MetricResource {
 			nbUsers = usersDates.size();
 
 		} catch (Exception e) {
-			log.error("SQL Error : " + e.getMessage());
+			log.error("SQL Error: " + e.getMessage());
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
-		return null;
+		return Response.ok("\"built\"").build();
 	}
 
 	/**
@@ -277,10 +267,15 @@ public class MetricResource {
 	 * @return true if logged in user is administrator, else false
 	 */
 	private boolean internalIsAuthorized() {
-		ApplicationUser user = authenticationContext.getLoggedInUser();
-		UserUtil userUtil = ComponentAccessor.getUserUtil();
-		return userUtil.getJiraAdministrators().contains(user)
-				|| userUtil.getJiraSystemAdministrators().contains(user);
+		try{
+		 ApplicationUser user = authenticationContext.getLoggedInUser();
+		 UserUtil userUtil = ComponentAccessor.getUserUtil();
+		 return userUtil.getJiraAdministrators().contains(user)
+			|| userUtil.getJiraSystemAdministrators().contains(user);
+		} catch(NoSuchMethodError nsm){
+			log.error("No Such Method: "+ nsm.getMessage());
+			return false;
+		}
 	}
 
 }
