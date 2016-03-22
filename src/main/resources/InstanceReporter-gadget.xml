@@ -89,8 +89,8 @@
 						<strong>Number of issues: </strong><span id="nb_issues"></span>
 						<br/>
 						<strong>Number of users (active): </strong><span id="nb_active_users"></span>
-            <br/>
-            <strong>Number of users: </strong><span id="nb_users"></span>
+                                               <br/>
+                                                <strong>Number of users (total): </strong><span id="nb_users"></span>
 					</center>
 		        </div>
 		    </div>
