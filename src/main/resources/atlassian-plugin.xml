@@ -3,13 +3,13 @@
 	<plugin-info>
 		<description>${project.description}</description>
 		<version>${project.version}</version>
-		<vendor name="By CERN ITS Team" url="http://www.cern.ch" />
-	</plugin-info>
+		<vendor name="${project.organization.name}" url="${project.organization.url}" />
+                <param name="plugin-icon">images/pluginIcon.png</param>
+                <param name="plugin-logo">images/pluginLogo.png</param>
+        </plugin-info>
 
-	<resource type="download" name="screenshot.png" location="/images/screenshot.png" />
-	<resource type="download" name="thumbnail.png" location="/images/thumbnail.png" />
-
-
+        <resource type="download" name="screenshot.png" location="/images/screenshot.png" />
+        <resource type="download" name="thumbnail.png" location="/images/thumbnail.png" />
 	<resource type="i18n" location="i18n/i18n" name="i18n" />
 
 	<web-resource key="reporter-resources">
