@@ -46,38 +46,37 @@ import com.atlassian.plugins.rest.common.security.AnonymousAllowed;
 @AnonymousAllowed
 @Produces({ MediaType.APPLICATION_JSON })
 public class MetricResource {
-	private final static Logger log = Logger.getLogger(MetricResource.class);
+    private final static Logger log = Logger.getLogger(MetricResource.class);
 
-	private List<Long> projectsDates;
-	private List<Long> issuesDates;
-	private List<Long> usersDates;
+    private List<Long> projectsDates;
+    private List<Long> issuesDates;
+    private List<Long> usersDates;
 
-	private int nbIssues = 0;
-	private int nbProjects = 0;
-	private int nbUsers = 0;
-  private int nbActiveUsers = 0;
+    private int nbIssues = 0;
+    private int nbProjects = 0;
+    private int nbUsers = 0;
+    private int nbActiveUsers = 0;
 
-	private final long tOld;// timestamp of 01/02/1970
+    private final long tOld;// timestamp of 01/02/1970
 
-	private final JiraAuthenticationContext authenticationContext;
-	private final DatabaseConfigurationManager dbConfigManager;
-	private final AtlassianBootstrapManager bootstrapManager;
+    private final JiraAuthenticationContext authenticationContext;
+    private final DatabaseConfigurationManager dbConfigManager;
+    private final AtlassianBootstrapManager bootstrapManager;
 
-	public MetricResource(final SearchService searchService,
-			final JiraAuthenticationContext authenticationContext) {
-		this.authenticationContext = authenticationContext;
-		this.dbConfigManager = ComponentManager
-				.getComponent(DatabaseConfigurationManager.class);
-		// TODO probably not the right way to do that.
-		this.bootstrapManager = new DefaultAtlassianBootstrapManager();
+    public MetricResource(final SearchService searchService,
+        final JiraAuthenticationContext authenticationContext) {
+        this.authenticationContext = authenticationContext;
+        this.dbConfigManager = ComponentManager
+         .getComponent(DatabaseConfigurationManager.class);
+        // TODO probably not the right way to do that.
+        this.bootstrapManager = new DefaultAtlassianBootstrapManager();
 
-		// we are using "tOld" as a trick for imported entities
-		// who have no "created" date set (then we use "updated").
-		Calendar oldDate = Calendar.getInstance();
-		oldDate.set(1970, 2, 1);
-		tOld = oldDate.getTime().getTime();
-
-	}
+        // we are using "tOld" as a trick for imported entities
+        // who have no "created" date set (then we use "updated").
+        Calendar oldDate = Calendar.getInstance();
+        oldDate.set(1970, 2, 1);
+        tOld = oldDate.getTime().getTime();
+    }
 
 	/**
 	 * This method is called to build (or refresh) inner data (all data that are
@@ -153,6 +152,7 @@ public class MetricResource {
 
 		} catch (Exception e) {
 			log.error("SQL Error: " + e.getMessage());
+                        e.printStackTrace();
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 		return Response.ok("\"built\"").build();
