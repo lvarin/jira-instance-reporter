@@ -1,0 +1,14 @@
+stages:
+    - build
+
+build:
+    stage: build
+    image: docker.cern.ch/agonzale/cc7-atlassian
+    script:
+        - atlas-mvn package
+    artifacts:
+        paths:
+            - target/*.jar
+    tags:
+        - mvn
+
