@@ -151,9 +151,9 @@ public class MetricResource {
 			nbUsers = usersDates.size();
 
 		} catch (Exception e) {
-			log.error("SQL Error: " + e.getMessage());
-                        e.printStackTrace();
-			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+		    log.error("Exception: " + e.getMessage());
+                    e.printStackTrace();
+		    return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 		return Response.ok("\"built\"").build();
 	}
