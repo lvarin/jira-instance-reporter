@@ -31,6 +31,7 @@ function populateTabData() {
                               .getElementById("nb_proj").innerHTML = nbProj;
                             document
                               .getElementById("nb_issues").innerHTML = nbIssues;
+                            }
                         });
                   }
                 });
