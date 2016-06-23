@@ -183,6 +183,7 @@
 		<plugin.testrunner.version>1.2.0</plugin.testrunner.version>
 	<!-- TestKit version 5.x for JIRA 5.x, 6.x for JIRA 6.x -->
 		<testkit.version>5.2.26</testkit.version>
+                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 </project>
