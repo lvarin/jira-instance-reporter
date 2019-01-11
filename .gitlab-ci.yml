@@ -3,7 +3,7 @@ stages:
 
 build:
     stage: build
-    image: docker.cern.ch/agonzale/cc7-atlassian
+    image: gitlab-registry.cern.ch/agonzale/cc7-atlassian
     script:
         - atlas-mvn package
     artifacts:
