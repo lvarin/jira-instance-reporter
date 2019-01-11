@@ -9,6 +9,4 @@ build:
     artifacts:
         paths:
             - target/*.jar
-    tags:
-        - mvn
 
