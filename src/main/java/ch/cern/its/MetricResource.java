@@ -176,11 +176,13 @@ public class MetricResource {
 
 			projectsDates = new ArrayList<Long>(projects.values());
 			Collections.sort(projectsDates);
-                        try {
-                            Collections.sort(issuesDates);
-                        } catch (NullPointerException npe) {
-                            log.error("NullPointerException while doing Collections.sort(issuesDates);");
-                        }
+
+			try {
+				Collections.sort(issuesDates);
+			} catch (NullPointerException npe) {
+				log.error("NullPointerException while doing Collections.sort(issuesDates);");
+			}
+
 			Collections.sort(usersDates);
 
 			nbIssues = issuesDates.size();
