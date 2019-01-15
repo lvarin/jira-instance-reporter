@@ -1,44 +1,39 @@
 function populateTabData() {
-  AJS.$
-    .ajax({
-      url: "/rest/reporter-rest/1.0/metric-manager/getNumberOfProjects",
-      type: "GET",
-      dataType: "json",
-      success: function(nbProj) {
-        AJS.$
-          .ajax({
-            url: "/rest/reporter-rest/1.0/metric-manager/getNumberOfIssues",
-            type: "GET",
-            dataType: "json",
-            success: function(nbIssues) {
-              AJS.$
-                .ajax({
-                  url: "/rest/reporter-rest/1.0/metric-manager/getNumberOfUsers",
-                  type: "GET",
-                  dataType: "json",
-                  success: function(nbUsers) {
-                    AJS.$
-                      .ajax({
-                          url: "/rest/reporter-rest/1.0/metric-manager/getNumberOfActiveUsers",
-                          type: "GET",
-                          dataType: "json",
-                          success: function(nbActiveUsers) {
-                            document
-                              .getElementById("nb_users").innerHTML = nbUsers;
-                            document
-                              .getElementById("nb_active_users").innerHTML = nbActiveUsers;
-                            document
-                              .getElementById("nb_proj").innerHTML = nbProj;
-                            document
-                              .getElementById("nb_issues").innerHTML = nbIssues;
-                            }
-                        });
-                  }
-                });
-            }
-          });
-      }
-    });
+  AJS.$.ajax({
+    url: "/rest/reporter-rest/1.0/metric-manager/getNumberOfProjects",
+    type: "GET",
+    dataType: "json",
+    success: function(nbProj) {
+      document.getElementById("nb_proj").innerHTML = nbProj;
+    }
+  });
+
+  AJS.$.ajax({
+    url: "/rest/reporter-rest/1.0/metric-manager/getNumberOfIssues",
+    type: "GET",
+    dataType: "json",
+    success: function(nbIssues) {
+      document.getElementById("nb_issues").innerHTML = nbIssues;
+    }
+  });
+
+  AJS.$.ajax({
+    url: "/rest/reporter-rest/1.0/metric-manager/getNumberOfUsers",
+    type: "GET",
+    dataType: "json",
+    success: function(nbUsers) {
+      document.getElementById("nb_users").innerHTML = nbUsers;
+    }
+  });
+
+  AJS.$.ajax({
+    url: "/rest/reporter-rest/1.0/metric-manager/getNumberOfActiveUsers",
+    type: "GET",
+    dataType: "json",
+    success: function(nbActiveUsers) {
+      document.getElementById("nb_active_users").innerHTML = nbActiveUsers;
+    }
+  });
 };
 
 /*
