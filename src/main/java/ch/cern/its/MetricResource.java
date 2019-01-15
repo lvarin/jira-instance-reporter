@@ -172,7 +172,7 @@ public class MetricResource {
 				nbActiveUsers = rs.getInt("count");
 			}
 
-      conn.close();
+            conn.close();
 
 			projectsDates = new ArrayList<Long>(projects.values());
 			Collections.sort(projectsDates);
