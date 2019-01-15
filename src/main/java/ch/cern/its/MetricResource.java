@@ -132,7 +132,7 @@ public class MetricResource {
 					.getDatasource().getConnection(bootstrapManager);
 
 			// looking for issues and projects infos
-			String sql = "select created, updated, project  from jiraissue";
+			String sql = "SELECT created, updated, project FROM jiraissue";
 			Statement stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 			while (rs.next()) {
@@ -153,7 +153,7 @@ public class MetricResource {
 			}
 
 			// looking for users info
-			sql = "select created_date, updated_date  from cwd_user";
+			sql = "SELECT created_date, updated_date FROM cwd_user";
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(sql);
 			while (rs.next()) {
