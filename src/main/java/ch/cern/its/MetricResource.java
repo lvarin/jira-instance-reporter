@@ -120,6 +120,11 @@ public class MetricResource {
 	@GET
 	@Path("/build")
 	public Response build() {
+
+		if (!internalIsAuthorized()) {
+			return Forbidden();
+		}
+
 		Long t = null;
 		String pKey = null;
 		Long tProj = null;
