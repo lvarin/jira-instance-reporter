@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Iterator;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -77,6 +78,38 @@ public class MetricResource {
         oldDate.set(1970, 2, 1);
         tOld = oldDate.getTime().getTime();
     }
+
+	/**
+	 * Shows the available endpoints
+	 *
+	 */
+	@GET
+	@Path("/")
+	public Response myCommands() {
+
+		String baseURL = ComponentAccessor.getApplicationProperties().getString("jira.baseurl")+
+			"/rest/reporter-rest/1.0/metric-manager";
+		String toReturn = "[";
+
+		List<String> message = new ArrayList<String>();
+
+		message.add("/build");
+		message.add("/getNumberOfProjects");
+		message.add("/getNumberOfUsers");
+		message.add("/getNumberOfActiveUsers");
+		message.add("/getNumberOfIssues");
+		message.add("/getUsersDates");
+		message.add("/getProjectsDates");
+		message.add("/getIssuesDates");
+
+		Iterator<String> iter = message.listIterator();
+        toReturn += "\""+baseURL+iter.next()+"\"";
+        for (; iter.hasNext();)
+            toReturn += ",\""+baseURL+iter.next()+"\"";
+		toReturn += "]";
+
+		return Response.status(200).entity(toReturn).build();
+	}
 
 	/**
 	 * This method is called to build (or refresh) inner data (all data that are
