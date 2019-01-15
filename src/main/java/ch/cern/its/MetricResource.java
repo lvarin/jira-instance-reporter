@@ -203,10 +203,10 @@ public class MetricResource {
 	@GET
 	@Path("/getNumberOfProjects")
 	public Response getNumberOfProjects() {
-/*		if (!internalIsAuthorized()) {
-			return Response.noContent().build();
+		if (!internalIsAuthorized()) {
+			return Forbidden();
 		}
-*/
+
 		return Response.ok(nbProjects).cacheControl(NO_CACHE).build();
 	}
 
@@ -218,10 +218,10 @@ public class MetricResource {
 	@GET
 	@Path("/getNumberOfUsers")
 	public Response getNumberOfUsers() {
-/*		if (!internalIsAuthorized()) {
-			return Response.noContent().build();
+		if (!internalIsAuthorized()) {
+			return Forbidden();
 		}
-*/
+
 		return Response.ok(nbUsers).cacheControl(NO_CACHE).build();
 	}
 
@@ -233,10 +233,10 @@ public class MetricResource {
 	@GET
 	@Path("/getNumberOfActiveUsers")
 	public Response getNumberOfActiveUsers() {
-/*		if (!internalIsAuthorized()) {
-			return Response.noContent().build();
+		if (!internalIsAuthorized()) {
+			return Forbidden();
 		}
-*/
+
 		return Response.ok(nbActiveUsers).cacheControl(NO_CACHE).build();
 	}
 
@@ -249,7 +249,7 @@ public class MetricResource {
 	@Path("/getNumberOfIssues")
 	public Response getNumberOfIssues() {
 		if (!internalIsAuthorized()) {
-			return Response.noContent().build();
+			return Forbidden();
 		}
 		return Response.ok(nbIssues).cacheControl(NO_CACHE).build();
 	}
@@ -264,7 +264,7 @@ public class MetricResource {
 	@Path("/getUsersDates")
 	public Response getUsersDates() {
 		if (!internalIsAuthorized()) {
-			return Response.noContent().build();
+			return Forbidden();
 		}
 		return Response.ok(usersDates).cacheControl(NO_CACHE).build();
 	}
@@ -280,7 +280,7 @@ public class MetricResource {
 	@Path("/getProjectsDates")
 	public Response getProjectsDates() {
 		if (!internalIsAuthorized()) {
-			return Response.noContent().build();
+			return Forbidden();
 		}
 		return Response.ok(projectsDates).cacheControl(NO_CACHE).build();
 	}
@@ -295,7 +295,7 @@ public class MetricResource {
 	@Path("/getIssuesDates")
 	public Response getIssuesDates() {
 		if (!internalIsAuthorized()) {
-			return Response.noContent().build();
+			return Forbidden();
 		}
 		return Response.ok(issuesDates).cacheControl(NO_CACHE).build();
 	}
@@ -315,4 +315,7 @@ public class MetricResource {
 		}
 	}
 
+	private Response Forbidden(){
+		return Response.status(Response.Status.FORBIDDEN).entity("{\"msg\":\"FORBIDDEN\"}").build();
+	}
 }
