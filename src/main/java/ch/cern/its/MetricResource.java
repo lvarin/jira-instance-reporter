@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Iterator;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -79,6 +80,38 @@ public class MetricResource {
     }
 
 	/**
+	 * Shows the available endpoints
+	 *
+	 */
+	@GET
+	@Path("/")
+	public Response myCommands() {
+
+		String baseURL = ComponentAccessor.getApplicationProperties().getString("jira.baseurl")+
+			"/rest/reporter-rest/1.0/metric-manager";
+		String toReturn = "[";
+
+		List<String> message = new ArrayList<String>();
+
+		message.add("/build");
+		message.add("/getNumberOfProjects");
+		message.add("/getNumberOfUsers");
+		message.add("/getNumberOfActiveUsers");
+		message.add("/getNumberOfIssues");
+		message.add("/getUsersDates");
+		message.add("/getProjectsDates");
+		message.add("/getIssuesDates");
+
+		Iterator<String> iter = message.listIterator();
+        toReturn += "\""+baseURL+iter.next()+"\"";
+        for (; iter.hasNext();)
+            toReturn += ",\""+baseURL+iter.next()+"\"";
+		toReturn += "]";
+
+		return Response.status(200).entity(toReturn).build();
+	}
+
+	/**
 	 * This method is called to build (or refresh) inner data (all data that are
 	 * provided via rest endpoints)
 	 *
@@ -87,6 +120,11 @@ public class MetricResource {
 	@GET
 	@Path("/build")
 	public Response build() {
+
+		if (!internalIsAuthorized()) {
+			return Forbidden();
+		}
+
 		Long t = null;
 		String pKey = null;
 		Long tProj = null;
@@ -99,7 +137,7 @@ public class MetricResource {
 					.getDatasource().getConnection(bootstrapManager);
 
 			// looking for issues and projects infos
-			String sql = "select created, updated, project  from jiraissue";
+			String sql = "SELECT created, updated, project FROM jiraissue";
 			Statement stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 			while (rs.next()) {
@@ -120,7 +158,7 @@ public class MetricResource {
 			}
 
 			// looking for users info
-			sql = "select created_date, updated_date  from cwd_user";
+			sql = "SELECT created_date, updated_date FROM cwd_user";
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(sql);
 			while (rs.next()) {
@@ -139,15 +177,17 @@ public class MetricResource {
 				nbActiveUsers = rs.getInt("count");
 			}
 
-      conn.close();
+            conn.close();
 
 			projectsDates = new ArrayList<Long>(projects.values());
 			Collections.sort(projectsDates);
-                        try {
-                            Collections.sort(issuesDates);
-                        } catch (NullPointerException npe) {
-                            log.error("NullPointerException while doing Collections.sort(issuesDates);");
-                        }
+
+			try {
+				Collections.sort(issuesDates);
+			} catch (NullPointerException npe) {
+				log.error("NullPointerException while doing Collections.sort(issuesDates);");
+			}
+
 			Collections.sort(usersDates);
 
 			nbIssues = issuesDates.size();
@@ -170,10 +210,10 @@ public class MetricResource {
 	@GET
 	@Path("/getNumberOfProjects")
 	public Response getNumberOfProjects() {
-/*		if (!internalIsAuthorized()) {
-			return Response.noContent().build();
+		if (!internalIsAuthorized()) {
+			return Forbidden();
 		}
-*/
+
 		return Response.ok(nbProjects).cacheControl(NO_CACHE).build();
 	}
 
@@ -185,10 +225,10 @@ public class MetricResource {
 	@GET
 	@Path("/getNumberOfUsers")
 	public Response getNumberOfUsers() {
-/*		if (!internalIsAuthorized()) {
-			return Response.noContent().build();
+		if (!internalIsAuthorized()) {
+			return Forbidden();
 		}
-*/
+
 		return Response.ok(nbUsers).cacheControl(NO_CACHE).build();
 	}
 
@@ -200,10 +240,10 @@ public class MetricResource {
 	@GET
 	@Path("/getNumberOfActiveUsers")
 	public Response getNumberOfActiveUsers() {
-/*		if (!internalIsAuthorized()) {
-			return Response.noContent().build();
+		if (!internalIsAuthorized()) {
+			return Forbidden();
 		}
-*/
+
 		return Response.ok(nbActiveUsers).cacheControl(NO_CACHE).build();
 	}
 
@@ -216,7 +256,7 @@ public class MetricResource {
 	@Path("/getNumberOfIssues")
 	public Response getNumberOfIssues() {
 		if (!internalIsAuthorized()) {
-			return Response.noContent().build();
+			return Forbidden();
 		}
 		return Response.ok(nbIssues).cacheControl(NO_CACHE).build();
 	}
@@ -231,7 +271,7 @@ public class MetricResource {
 	@Path("/getUsersDates")
 	public Response getUsersDates() {
 		if (!internalIsAuthorized()) {
-			return Response.noContent().build();
+			return Forbidden();
 		}
 		return Response.ok(usersDates).cacheControl(NO_CACHE).build();
 	}
@@ -247,7 +287,7 @@ public class MetricResource {
 	@Path("/getProjectsDates")
 	public Response getProjectsDates() {
 		if (!internalIsAuthorized()) {
-			return Response.noContent().build();
+			return Forbidden();
 		}
 		return Response.ok(projectsDates).cacheControl(NO_CACHE).build();
 	}
@@ -262,7 +302,7 @@ public class MetricResource {
 	@Path("/getIssuesDates")
 	public Response getIssuesDates() {
 		if (!internalIsAuthorized()) {
-			return Response.noContent().build();
+			return Forbidden();
 		}
 		return Response.ok(issuesDates).cacheControl(NO_CACHE).build();
 	}
@@ -282,4 +322,7 @@ public class MetricResource {
 		}
 	}
 
+	private Response Forbidden(){
+		return Response.status(Response.Status.FORBIDDEN).entity("{\"msg\":\"FORBIDDEN\"}").build();
+	}
 }
