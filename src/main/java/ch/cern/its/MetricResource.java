@@ -27,7 +27,7 @@ import com.atlassian.config.bootstrap.AtlassianBootstrapManager;
 import com.atlassian.config.bootstrap.DefaultAtlassianBootstrapManager;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.ComponentManager;
+//import com.atlassian.jira.ComponentManager;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.config.database.DatabaseConfigurationManager;
@@ -67,8 +67,8 @@ public class MetricResource {
     public MetricResource(final SearchService searchService,
         final JiraAuthenticationContext authenticationContext) {
         this.authenticationContext = authenticationContext;
-        this.dbConfigManager = ComponentManager
-         .getComponent(DatabaseConfigurationManager.class);
+		//this.dbConfigManager = ComponentManager.getComponent(DatabaseConfigurationManager.class);
+		this.dbConfigManager = ComponentAccessor.getComponent(DatabaseConfigurationManager.class);
         // TODO probably not the right way to do that.
         this.bootstrapManager = new DefaultAtlassianBootstrapManager();
 
