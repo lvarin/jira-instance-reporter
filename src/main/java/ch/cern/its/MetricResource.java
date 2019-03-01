@@ -1,5 +1,7 @@
 package ch.cern.its;
 
+import ch.cern.its.ProjectData;
+
 import static com.atlassian.jira.rest.v1.util.CacheControl.NO_CACHE;
 
 import java.sql.Connection;
@@ -52,12 +54,17 @@ public class MetricResource {
     private List<Long> projectsDates;
     private List<Long> issuesDates;
     private List<Long> usersDates;
+	HashMap<String, ProjectData> projects;
+	//HashMap<String, HashMap<String, String>> projects;
 
     private int nbIssues = 0;
     private int nbProjects = 0;
     private int nbUsers = 0;
     private int nbActiveUsers = 0;
 
+	// We have ~400 issues with corrupted create date.
+	// All corrupted dates are from the 1st Jan 1970 from 1h20 till 1h22.
+	// maybe there is a better way to fix this.
     private final long tOld;// timestamp of 01/02/1970
 
     private final JiraAuthenticationContext authenticationContext;
@@ -71,6 +78,9 @@ public class MetricResource {
 		this.dbConfigManager = ComponentAccessor.getComponent(DatabaseConfigurationManager.class);
         // TODO probably not the right way to do that.
         this.bootstrapManager = new DefaultAtlassianBootstrapManager();
+
+		this.projects = new HashMap<String, ProjectData>();
+		//this.projects = new HashMap<String, HashMap<String,String>>();
 
         // we are using "tOld" as a trick for imported entities
         // who have no "created" date set (then we use "updated").
@@ -128,7 +138,6 @@ public class MetricResource {
 		Long t = null;
 		String pKey = null;
 		Long tProj = null;
-		HashMap<String, Long> projects = new HashMap<String, Long>();
 		issuesDates = new ArrayList<Long>();
 		usersDates = new ArrayList<Long>();
 
@@ -145,15 +154,25 @@ public class MetricResource {
 				if (t < tOld) {
 					t = rs.getDate(2).getTime();
 				}
+				// Produce an array of created issues
 				issuesDates.add(t);
+
+				// Retrieve the Project Key
 				pKey = rs.getString(3);
+
 				// t is the date of creation of the issue
-				if ((tProj = projects.get(pKey)) == null) {
-					projects.put(pKey, t);
-				} else {
-					if (t < tProj) {
-						projects.put(pKey, t);
-					}
+
+				// Better use a try catch ?
+				// tProj is the current stored t for the project
+				// we will update it if 't' is < 'tProj'
+				if (projects.get(pKey) == null) {
+					projects.put(pKey, new ProjectData());
+					projects.get(pKey).setTime(t);
+				}
+				tProj = projects.get(pKey).getTime();
+
+				if (t < tProj) {
+					projects.get(pKey).setTime(t);
 				}
 			}
 
@@ -179,7 +198,12 @@ public class MetricResource {
 
             conn.close();
 
-			projectsDates = new ArrayList<Long>(projects.values());
+			projectsDates = new ArrayList<Long>(projects.size());
+
+			for(ProjectData pd : projects.values()) {
+				projectsDates.add(pd.getTime());
+			}
+
 			Collections.sort(projectsDates);
 
 			try {
@@ -215,6 +239,12 @@ public class MetricResource {
 		}
 
 		return Response.ok(nbProjects).cacheControl(NO_CACHE).build();
+	}
+
+	@GET
+	@Path("/getProjectsData")
+	public Response getProjectsData() {
+		return Response.ok(projects).cacheControl(NO_CACHE).build();
 	}
 
 	/**
