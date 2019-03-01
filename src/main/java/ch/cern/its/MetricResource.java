@@ -146,7 +146,8 @@ public class MetricResource {
 					.getDatasource().getConnection(bootstrapManager);
 
 			// looking for issues and projects infos
-			String sql = "SELECT created, updated, project FROM jiraissue";
+			//String sql = "SELECT created, updated, project FROM jiraissue";
+			String sql = "SELECT created, updated, project.pkey FROM jiraissue inner join project on jiraissue.project = project.id";
 			Statement stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 			while (rs.next()) {
@@ -174,6 +175,8 @@ public class MetricResource {
 				if (t < tProj) {
 					projects.get(pKey).setTime(t);
 				}
+				//projects.get(pKey).increaseIssueNum
+
 			}
 
 			// looking for users info
