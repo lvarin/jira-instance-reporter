@@ -365,4 +365,30 @@ public class MetricResource {
 	private Response Forbidden(){
 		return Response.status(Response.Status.FORBIDDEN).entity("{\"msg\":\"FORBIDDEN\"}").build();
 	}
+
+
+	/**
+	 * Connects to the DB is there is no conection yet
+	 */
+	private void connect() {
+		if(this.conn == null)
+			try {
+				this.conn = dbConfigManager.getDatabaseConfiguration()
+						.getDatasource().getConnection(bootstrapManager);
+			} catch(BootstrapException bse) {
+				log.error("BootstrapException: " + bse.getMessage());
+				bse.printStackTrace();
+			}
+    }
+
+	private void disConnect(){
+
+		try{
+			this.conn.close();
+			this.conn = null;
+		} catch (SQLException sqle) {
+			log.error("SQLException: " + sqle.getMessage());
+			sqle.printStackTrace();
+		}
+	}
 }
