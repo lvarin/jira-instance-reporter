@@ -253,6 +253,10 @@ public class MetricResource {
 	@GET
 	@Path("/getProjectsData")
 	public Response getProjectsData() {
+		if (!internalIsAuthorized()) {
+			return Forbidden();
+		}
+
 		return Response.ok(projects).cacheControl(NO_CACHE).build();
 	}
 
