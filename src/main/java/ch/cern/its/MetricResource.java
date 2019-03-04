@@ -230,7 +230,7 @@ public class MetricResource {
 	}
 
 	/**
-	 * If user is not administrator, no content is returned
+	 * If user is not administrator, Forbidden is returned
 	 *
 	 * @return number of projects with at least one issue
 	 */
@@ -244,6 +244,12 @@ public class MetricResource {
 		return Response.ok(nbProjects).cacheControl(NO_CACHE).build();
 	}
 
+	/**
+	 * If user is not administrator, Forbidden is returned
+	 *
+	 * @return A JSON representation of the current list of projects
+	 * 	and some of its data
+	 */
 	@GET
 	@Path("/getProjectsData")
 	public Response getProjectsData() {
@@ -251,7 +257,7 @@ public class MetricResource {
 	}
 
 	/**
-	 * If user is not administrator, no content is returned
+	 * If user is not administrator, Forbidden is returned
 	 *
 	 * @return number of users in CWD_USER table
 	 */
@@ -266,7 +272,7 @@ public class MetricResource {
 	}
 
 	/**
-	 * If user is not administrator, no content is returned
+	 * If user is not administrator, Forbidden is returned
 	 *
 	 * @return number of active users in CWD_USER table
 	 */
@@ -281,7 +287,7 @@ public class MetricResource {
 	}
 
 	/**
-	 * If user is not administrator, no content is returned
+	 * If user is not administrator, Forbidden is returned
 	 *
 	 * @return total number of issues
 	 */
@@ -295,7 +301,7 @@ public class MetricResource {
 	}
 
 	/**
-	 * If user is not administrator, no content is returned
+	 * If user is not administrator, Forbidden is returned
 	 *
 	 * @return sorted list of dates corresponding to User creation
 	 *         (usersDates.size() --> number of users)
@@ -310,7 +316,7 @@ public class MetricResource {
 	}
 
 	/**
-	 * If user is not administrator, no content is returned. Project date
+	 * If user is not administrator, Forbidden is returned. Project date
 	 * creation is estimated with its oldest issue creation date
 	 *
 	 * @return sorted list of dates corresponding to Project creation
@@ -326,7 +332,7 @@ public class MetricResource {
 	}
 
 	/**
-	 * If user is not administrator, no content is returned
+	 * If user is not administrator, Forbidden is returned
 	 *
 	 * @return sorted list of dates corresponding to issues creation
 	 *         (issuesDates.size() --> number of issues)
