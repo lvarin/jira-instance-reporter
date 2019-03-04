@@ -7,6 +7,7 @@ import static com.atlassian.jira.rest.v1.util.CacheControl.NO_CACHE;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -27,6 +28,7 @@ import com.atlassian.jira.component.ComponentAccessor;
 
 import com.atlassian.config.bootstrap.AtlassianBootstrapManager;
 import com.atlassian.config.bootstrap.DefaultAtlassianBootstrapManager;
+import com.atlassian.config.bootstrap.BootstrapException;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.user.ApplicationUser;
 //import com.atlassian.jira.ComponentManager;
@@ -71,6 +73,8 @@ public class MetricResource {
     private final JiraAuthenticationContext authenticationContext;
     private final DatabaseConfigurationManager dbConfigManager;
     private final AtlassianBootstrapManager bootstrapManager;
+
+	private Connection conn = null;
 
     public MetricResource(final SearchService searchService,
         final JiraAuthenticationContext authenticationContext) {
@@ -132,20 +136,46 @@ public class MetricResource {
 			return Forbidden();
 		}
 
+		this.connect();
+
+		Response buildProjects = this.buildProjects();
+
+		///////////////////////////////////////////////////////////////////
+
+		Response buildUsers = this.buildUsers();
+
+		///////////////////////////////////////////////////////////////////
+
+		Response buildActiveUsers = this.buildActiveUsers();
+
+		this.disConnect();
+
+		return Response.ok("\"built\"").build();
+	}
+
+	/**
+	 * This method is called to build (or refresh) project data
+	 *
+	 */
+	private Response buildProjects(){
+
 		Long t = null;
 		String pKey = null;
 		Long tProj = null;
 		issuesDates = new ArrayList<Long>();
-		usersDates = new ArrayList<Long>();
+
+		// Reset number of issues per project
+		for(String pk : projects.keySet()) {
+			projects.get(pk).setNbIssues(0);
+		}
+
+		// looking for issues and projects infos
+		//String sql = "SELECT created, updated, project FROM jiraissue";
+		String sql = "SELECT created, updated, project.pkey FROM jiraissue inner join project on jiraissue.project = project.id";
 
 		try {
-			Connection conn = dbConfigManager.getDatabaseConfiguration()
-					.getDatasource().getConnection(bootstrapManager);
 
-			// looking for issues and projects infos
-			//String sql = "SELECT created, updated, project FROM jiraissue";
-			String sql = "SELECT created, updated, project.pkey FROM jiraissue inner join project on jiraissue.project = project.id";
-			Statement stmt = conn.createStatement();
+			Statement stmt = this.conn.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 			while (rs.next()) {
 				t = rs.getDate(1).getTime();
@@ -172,14 +202,52 @@ public class MetricResource {
 				if (t < tProj) {
 					projects.get(pKey).setTime(t);
 				}
-				//projects.get(pKey).increaseIssueNum
-
+				projects.get(pKey).increateNumberIssues();
 			}
 
-			// looking for users info
-			sql = "SELECT created_date, updated_date FROM cwd_user";
-			stmt = conn.createStatement();
-			rs = stmt.executeQuery(sql);
+		} catch (SQLException sqle) {
+			log.error("SQLException: " + sqle.getMessage());
+					sqle.printStackTrace();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+		}
+
+		projectsDates = new ArrayList<Long>(projects.size());
+
+		for(ProjectData pd : projects.values()) {
+			projectsDates.add(pd.getTime());
+		}
+
+		Collections.sort(projectsDates);
+		nbProjects = projectsDates.size();
+
+		try {
+			Collections.sort(issuesDates);
+		} catch (NullPointerException npe) {
+			log.error("NullPointerException while doing Collections.sort(issuesDates);");
+		}
+
+		nbIssues = issuesDates.size();
+
+		return Response.ok("\"Users Built\"").build();
+	}
+
+	/**
+	 * This method is called to build (or refresh) User data
+	 *
+	 */
+	private Response buildUsers(){
+		// looking for users info
+		Long t;
+		this.usersDates = new ArrayList<Long>();
+
+		String sql = "SELECT created_date, updated_date FROM cwd_user";
+
+		if(this.conn == null) this.connect();
+
+		try {
+
+			Statement stmt = this.conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
 			while (rs.next()) {
 				t = rs.getDate(1).getTime();
 				if (t < tOld) {
@@ -187,43 +255,42 @@ public class MetricResource {
 				}
 				usersDates.add(t);
 			}
+		} catch(SQLException sqle) {
+			log.error("SQLException: " + sqle.getMessage());
+			sqle.printStackTrace();
 
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+		}
+
+		Collections.sort(usersDates);
+		nbUsers = usersDates.size();
+
+		return Response.ok("\"Users Built\"").build();
+	}
+
+	/**
+	 * This method is called to build (or refresh) active User data
+	 *
+	 */
+	private Response buildActiveUsers(){
+
+		try {
 			// looking for users info
-			sql = "SELECT COUNT(*) AS count FROM cwd_user WHERE active='1'";
-			stmt = conn.createStatement();
-			rs = stmt.executeQuery(sql);
+			String sql = "SELECT COUNT(*) AS count FROM cwd_user WHERE active='1'";
+			Statement stmt = this.conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
 			while (rs.next()) {
 				nbActiveUsers = rs.getInt("count");
 			}
 
-            conn.close();
+		} catch(SQLException sqle) {
+			log.error("SQLException: " + sqle.getMessage());
+			sqle.printStackTrace();
 
-			projectsDates = new ArrayList<Long>(projects.size());
-
-			for(ProjectData pd : projects.values()) {
-				projectsDates.add(pd.getTime());
-			}
-
-			Collections.sort(projectsDates);
-
-			try {
-				Collections.sort(issuesDates);
-			} catch (NullPointerException npe) {
-				log.error("NullPointerException while doing Collections.sort(issuesDates);");
-			}
-
-			Collections.sort(usersDates);
-
-			nbIssues = issuesDates.size();
-			nbProjects = projectsDates.size();
-			nbUsers = usersDates.size();
-
-		} catch (Exception e) {
-		    log.error("Exception: " + e.getMessage());
-                    e.printStackTrace();
-		    return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
-		return Response.ok("\"built\"").build();
+
+		return Response.ok("\"Active Users Built\"").build();
 	}
 
 	/**
@@ -267,6 +334,10 @@ public class MetricResource {
 	public Response getNumberOfUsers() {
 		if (!internalIsAuthorized()) {
 			return Forbidden();
+		}
+
+		if (this.nbUsers == 0){
+			this.buildUsers();
 		}
 
 		return Response.ok(nbUsers).cacheControl(NO_CACHE).build();

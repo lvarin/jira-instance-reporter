@@ -5,6 +5,7 @@ import java.sql.Date;
 
 public class ProjectData {
     private Long Time = 0L;
+    private Integer nbIssues = 0;
 
     public void setTime(Long t){
         this.Time = t;
@@ -19,5 +20,16 @@ public class ProjectData {
         return this.Time;
     }
 
+    public Integer increateNumberIssues(){
+        return ++this.nbIssues;
+    }
 
+    public void setNbIssues(Integer nbIssues){
+        this.nbIssues = nbIssues;
+    }
+
+    @JsonProperty
+    public Integer getNumberOfIssues(){
+        return this.nbIssues;
+    }
 }
