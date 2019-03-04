@@ -66,6 +66,7 @@ public class MetricResource {
 	// All corrupted dates are from the 1st Jan 1970 from 1h20 till 1h22.
 	// maybe there is a better way to fix this.
     private final long tOld;// timestamp of 01/02/1970
+	private String baseURL;
 
     private final JiraAuthenticationContext authenticationContext;
     private final DatabaseConfigurationManager dbConfigManager;
@@ -86,8 +87,12 @@ public class MetricResource {
         // who have no "created" date set (then we use "updated").
         Calendar oldDate = Calendar.getInstance();
         oldDate.set(1970, 2, 1);
-        tOld = oldDate.getTime().getTime();
-    }
+		tOld = oldDate.getTime().getTime();
+
+		baseURL = ComponentAccessor.getApplicationProperties().getString("jira.baseurl")+
+		"/rest/reporter-rest/1.0/metric-manager";
+
+	}
 
 	/**
 	 * Shows the available endpoints
@@ -97,28 +102,20 @@ public class MetricResource {
 	@Path("/")
 	public Response myCommands() {
 
-		String baseURL = ComponentAccessor.getApplicationProperties().getString("jira.baseurl")+
-			"/rest/reporter-rest/1.0/metric-manager";
-		String toReturn = "[";
-
 		List<String> message = new ArrayList<String>();
 
-		message.add("/build");
-		message.add("/getNumberOfProjects");
-		message.add("/getNumberOfUsers");
-		message.add("/getNumberOfActiveUsers");
-		message.add("/getNumberOfIssues");
-		message.add("/getUsersDates");
-		message.add("/getProjectsDates");
-		message.add("/getIssuesDates");
+		message.add(baseURL+"/build");
+		message.add(baseURL+"/getNumberOfProjects");
+		message.add(baseURL+"/getNumberOfUsers");
+		message.add(baseURL+"/getNumberOfActiveUsers");
+		message.add(baseURL+"/getNumberOfIssues");
+		message.add(baseURL+"/getUsersDates");
+		message.add(baseURL+"/getProjectsDates");
+		message.add(baseURL+"/getIssuesDates");
+		message.add(baseURL+"/getProjectsData");
 
-		Iterator<String> iter = message.listIterator();
-        toReturn += "\""+baseURL+iter.next()+"\"";
-        for (; iter.hasNext();)
-            toReturn += ",\""+baseURL+iter.next()+"\"";
-		toReturn += "]";
-
-		return Response.status(200).entity(toReturn).build();
+		//return Response.status(200).entity(toReturn).build();
+		return Response.status(200).entity(message).build();
 	}
 
 	/**
