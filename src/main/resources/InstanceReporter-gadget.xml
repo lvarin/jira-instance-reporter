@@ -91,6 +91,7 @@
 						<strong>Number of users (active): </strong><span id="nb_active_users"></span>
                                                <br/>
                                                 <strong>Number of users (total): </strong><span id="nb_users"></span>
+                                                <strong>API link: </strong><span id=""><a href='__ATLASSIAN_BASE_URL__/rest/reporter-rest/1.0/metric-manager/'>Metric manager</span>
 					</center>
 		        </div>
 		    </div>
