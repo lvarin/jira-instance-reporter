@@ -6,6 +6,7 @@ import java.sql.Date;
 public class ProjectData {
     private Long Time = 0L;
     private Integer nbIssues = 0;
+    private String Lead = "";
 
     public void setTime(Long t){
         this.Time = t;
@@ -31,5 +32,14 @@ public class ProjectData {
     @JsonProperty
     public Integer getNumberOfIssues(){
         return this.nbIssues;
+    }
+
+    @JsonProperty
+    public String getLead(){
+        return this.Lead;
+    }
+
+    public void setLead(String lead){
+        this.Lead = lead;
     }
 }

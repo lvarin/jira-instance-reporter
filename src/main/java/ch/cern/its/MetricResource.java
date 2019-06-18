@@ -161,6 +161,7 @@ public class MetricResource {
 
         Long t = null;
         String pKey = null;
+        String  lead = null;
         Long tProj = null;
         issuesDates = new ArrayList<Long>();
 
@@ -171,7 +172,7 @@ public class MetricResource {
 
         // looking for issues and projects infos
         //String sql = "SELECT created, updated, project FROM jiraissue";
-        String sql = "SELECT created, updated, project.pkey FROM jiraissue inner join project on jiraissue.project = project.id";
+        String sql = "SELECT created, updated, project.pkey, project.lead FROM jiraissue inner join project on jiraissue.project = project.id";
 
         try {
 
@@ -187,6 +188,8 @@ public class MetricResource {
 
                 // Retrieve the Project Key
                 pKey = rs.getString(3);
+                // Retrieve the Project lead
+                lead = rs.getString(4);
 
                 // t is the date of creation of the issue
 
@@ -196,6 +199,7 @@ public class MetricResource {
                 if (projects.get(pKey) == null) {
                     projects.put(pKey, new ProjectData());
                     projects.get(pKey).setTime(t);
+                    projects.get(pKey).setLead(lead);
                 }
                 tProj = projects.get(pKey).getTime();
 
@@ -228,7 +232,7 @@ public class MetricResource {
 
         nbIssues = issuesDates.size();
 
-        return Response.ok("\"Users Built\"").build();
+        return Response.ok("\"Projects Built\"").build();
     }
 
     /**
