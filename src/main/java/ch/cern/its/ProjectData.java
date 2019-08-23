@@ -3,43 +3,95 @@ package ch.cern.its;
 import org.codehaus.jackson.annotate.JsonProperty;
 import java.sql.Date;
 
+/**
+ * Class to store a project data.
+ */
 public class ProjectData {
-    private Long Time = 0L;
+    /**
+     * The creation time of the project.
+     */
+    private Long time = 0L;
+    /**
+     * The number of issues the project has.
+     */
     private Integer nbIssues = 0;
-    private String Lead = "";
+    /**
+     * The project lead.
+     */
+    private String lead = "";
 
-    public void setTime(Long t){
-        this.Time = t;
+    /**
+     * Sets the time value.
+     *
+     * @param t The value to set as time
+     */
+    public void setTime(final Long t) {
+        this.time = t;
     }
 
+    /**
+     * Returns the creation date in Date format.
+     *
+     * @return the creation date in Date format
+     */
     @JsonProperty
     public Date getCreationDate() {
-        return new Date(this.Time);
+        return new Date(this.time);
     }
 
-    public Long getTime(){
-        return this.Time;
+    /**
+     * Returns the value of the current time.
+     *
+     * @return The value of the current time
+     */
+    public Long getTime() {
+        return this.time;
     }
 
-    public Integer increateNumberIssues(){
+    /**
+     * Increased by one the number of issues.
+     *
+     * @return The increased number of issues
+     */
+    public Integer increateNumberIssues() {
         return ++this.nbIssues;
     }
 
-    public void setNbIssues(Integer nbIssues){
-        this.nbIssues = nbIssues;
+    /**
+     * Sets the number of issues.
+     *
+     * @param nbIssuesP The value to set as number of issues
+     */
+    public void setNbIssues(final Integer nbIssuesP) {
+        this.nbIssues = nbIssuesP;
     }
 
+    /**
+     * Returns the number of issues.
+     *
+     * @return the number of issues
+     */
     @JsonProperty
-    public Integer getNumberOfIssues(){
+    public Integer getNumberOfIssues() {
         return this.nbIssues;
     }
 
+    /**
+     * Returns the lead parameter.
+     *
+     * @return The string reprepsenting the lead
+     */
     @JsonProperty
-    public String getLead(){
-        return this.Lead;
+    public String getLead() {
+        return this.lead;
     }
 
-    public void setLead(String lead){
-        this.Lead = lead;
+    /**
+     * Sets the value for the lead parameter.
+     *
+     * @param l String of the Lead
+     */
+    public void setLead(final String l) {
+        this.lead = l;
     }
 }
